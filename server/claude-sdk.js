@@ -480,9 +480,33 @@ async function queryClaudeSDK(command, options = {}, ws) {
     });
   };
 
+  // Track venv PATH injection for cleanup
+  let prevPath = null;
+  let venvActivated = false;
+
   try {
     // Map CLI options to SDK format
     const sdkOptions = mapCliOptionsToSDK(options);
+
+    // Activate project-specific venv if it exists
+    if (options.cwd) {
+      const venvScripts = path.join(options.cwd, '.venv', 'Scripts'); // Windows
+      const venvBin = path.join(options.cwd, '.venv', 'bin');         // Linux/Mac
+      try {
+        const winStat = await fs.stat(venvScripts).catch(() => null);
+        const nixStat = await fs.stat(venvBin).catch(() => null);
+        const venvPath = winStat ? venvScripts : (nixStat ? venvBin : null);
+        if (venvPath) {
+          prevPath = process.env.PATH;
+          process.env.PATH = `${venvPath}${path.delimiter}${process.env.PATH}`;
+          process.env.VIRTUAL_ENV = path.join(options.cwd, '.venv');
+          venvActivated = true;
+          console.log(`[VENV] Activated: ${venvPath} for project ${options.cwd}`);
+        }
+      } catch (e) {
+        // No venv found, continue without it
+      }
+    }
 
     // Load MCP configuration
     const mcpServers = await loadMcpConfig(options.cwd);
@@ -679,6 +703,13 @@ async function queryClaudeSDK(command, options = {}, ws) {
     // Clean up temporary image files
     await cleanupTempFiles(tempImagePaths, tempDir);
 
+    // Restore venv PATH
+    if (venvActivated && prevPath !== null) {
+      process.env.PATH = prevPath;
+      delete process.env.VIRTUAL_ENV;
+      console.log(`[VENV] Deactivated for project ${options.cwd}`);
+    }
+
     // Send completion event
     ws.send(createNormalizedMessage({ kind: 'complete', exitCode: 0, isNewSession: !sessionId && !!command, sessionId: capturedSessionId, provider: 'claude' }));
     notifyRunStopped({
@@ -700,6 +731,13 @@ async function queryClaudeSDK(command, options = {}, ws) {
 
     // Clean up temporary image files on error
     await cleanupTempFiles(tempImagePaths, tempDir);
+
+    // Restore venv PATH on error
+    if (venvActivated && prevPath !== null) {
+      process.env.PATH = prevPath;
+      delete process.env.VIRTUAL_ENV;
+      console.log(`[VENV] Deactivated (error) for project ${options.cwd}`);
+    }
 
     // Send error to WebSocket
     ws.send(createNormalizedMessage({ kind: 'error', content: error.message, sessionId: capturedSessionId || sessionId || null, provider: 'claude' }));

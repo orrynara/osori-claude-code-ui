@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { Folder, MessageSquare, Search } from 'lucide-react';
+import OsoriPanel from './OsoriPanel';
 import type { TFunction } from 'i18next';
 import { ScrollArea } from '../../../../shared/view/ui';
 import type { Project } from '../../../../types/app';
@@ -93,7 +94,7 @@ export default function SidebarContent({
 
   return (
     <div
-      className="flex h-full flex-col bg-background/80 backdrop-blur-sm md:w-72 md:select-none"
+      className="flex h-full flex-col bg-background/80 backdrop-blur-sm md:w-[480px] md:select-none"
       style={{}}
     >
       <SidebarHeader
@@ -212,6 +213,8 @@ export default function SidebarContent({
           <SidebarProjectList {...projectListProps} />
         )}
       </ScrollArea>
+
+      <OsoriPanel />
 
       <SidebarFooter
         updateAvailable={updateAvailable}

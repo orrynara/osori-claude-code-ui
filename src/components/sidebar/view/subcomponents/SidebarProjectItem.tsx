@@ -130,10 +130,10 @@ export default function SidebarProjectItem({
             onClick={toggleProject}
           >
             <div className="flex items-center justify-between">
-              <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div className="flex flex-1 items-center gap-3" style={{overflow:'visible'}}>
                 <div
                   className={cn(
-                    'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+                    'w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0',
                     isExpanded ? 'bg-primary/10' : 'bg-muted',
                   )}
                 >
@@ -144,7 +144,7 @@ export default function SidebarProjectItem({
                   )}
                 </div>
 
-                <div className="min-w-0 flex-1">
+                <div className="flex-1" style={{overflow:'visible'}}>
                   {isEditing ? (
                     <input
                       type="text"
@@ -172,8 +172,8 @@ export default function SidebarProjectItem({
                     />
                   ) : (
                     <>
-                      <div className="flex min-w-0 flex-1 items-center justify-between">
-                        <h3 className="truncate text-sm font-medium text-foreground">{project.displayName}</h3>
+                      <div className="flex flex-1 items-center justify-between" style={{overflow:'visible'}}>
+                        <h3 className="text-sm font-medium text-foreground" style={{wordBreak:'break-word',whiteSpace:'normal',overflow:'visible'}} title={project.displayName}>{project.displayName}</h3>
                         {tasksEnabled && (
                           <TaskIndicator
                             status={taskStatus}
@@ -305,21 +305,21 @@ export default function SidebarProjectItem({
                       }
                     }}
                   />
-                  <div className="truncate text-xs text-muted-foreground" title={project.fullPath}>
+                  <div className="text-xs text-muted-foreground break-all" title={project.fullPath}>
                     {project.fullPath}
                   </div>
                 </div>
               ) : (
                 <div>
-                  <div className="truncate text-sm font-semibold text-foreground" title={project.displayName}>
+                  <div className="text-sm font-semibold text-foreground break-all" title={project.displayName}>
                     {project.displayName}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {sessionCountDisplay}
                     {project.fullPath !== project.displayName && (
-                      <span className="ml-1 opacity-60" title={project.fullPath}>
+                      <span className="ml-1 opacity-60 break-all" title={project.fullPath}>
                         {' - '}
-                        {project.fullPath.length > 25 ? `...${project.fullPath.slice(-22)}` : project.fullPath}
+                        {project.fullPath}
                       </span>
                     )}
                   </div>

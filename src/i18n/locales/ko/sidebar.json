@@ -20,8 +20,8 @@
     "runClaudeCli": "프로젝트 디렉토리에서 Claude CLI를 실행하여 시작하세요"
   },
   "app": {
-    "title": "Claude Code UI",
-    "subtitle": "AI 코딩 어시스턴트 UI"
+    "title": "OSORI CLAUDE CODE UI",
+    "subtitle": "오소리 부장 AI 코딩 어시스턴트"
   },
   "sessions": {
     "title": "세션",
